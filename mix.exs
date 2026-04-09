@@ -26,6 +26,7 @@ defmodule ExYang.MixProject do
     [
       {:nimble_parsec, "~> 1.4"},
       {:ecto, "~> 3.12"},
+      {:ecto_sql, "~> 3.12"},
       {:ecto_sqlite3, "~> 0.17", optional: true},
       {:postgrex, "~> 0.19", optional: true},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false}
