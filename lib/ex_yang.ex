@@ -28,4 +28,20 @@ defmodule ExYang do
       {:error, reason} -> raise "ExYang parse error: #{inspect(reason)}"
     end
   end
+
+  @doc """
+  Encode a YANG model struct back to YANG source text.
+
+  Returns `{:ok, yang_source}`.
+  """
+  @spec encode(struct()) :: {:ok, String.t()}
+  defdelegate encode(module), to: ExYang.Encoder.Encoder
+
+  @doc """
+  Format a YANG model struct to canonical style.
+
+  Returns `{:ok, yang_source}`.
+  """
+  @spec format(struct()) :: {:ok, String.t()}
+  defdelegate format(module), to: ExYang.Encoder.Formatter
 end
