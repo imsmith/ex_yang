@@ -1,0 +1,9 @@
+module minimal {
+  namespace "urn:example:minimal";
+  prefix min;
+
+  leaf name {
+    type string;
+    description "A simple leaf";
+  }
+}
