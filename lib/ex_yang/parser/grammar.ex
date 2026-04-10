@@ -19,11 +19,18 @@ defmodule ExYang.Parser.Grammar do
   @type keyword_t :: atom() | {atom(), atom()}
 
   @doc """
-  Parse YANG source into a generic statement tree.
+  Parse a YANG source string into a generic statement tree.
 
   Returns `{:ok, statements, comments, blank_lines}` or `{:error, reason}`.
 
   The extra `comments` and `blank_lines` are returned for the comment attacher.
+
+  ## Examples
+
+      iex> {:ok, stmts, _, _} = ExYang.Parser.Grammar.parse("leaf name { type string; }")
+      iex> [{:leaf, "name", [{:type, "string", [], _}], _}] = stmts
+      iex> length(stmts)
+      1
   """
   @spec parse(String.t()) :: {:ok, [statement()]} | {:error, String.t()}
   def parse(input) do

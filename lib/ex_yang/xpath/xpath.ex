@@ -9,6 +9,15 @@ defmodule ExYang.XPath do
   # Public API
   # ---------------------------------------------------------------------------
 
+  @doc """
+  Parse an XPath expression string into an AST.
+
+  ## Examples
+
+      iex> {:ok, ast} = ExYang.XPath.parse("../name")
+      iex> match?({:path, :relative, _}, ast)
+      true
+  """
   @spec parse(String.t()) :: {:ok, term()} | {:error, String.t()}
   def parse(input) when is_binary(input) do
     tokens = tokenize(String.trim(input))
@@ -24,6 +33,15 @@ defmodule ExYang.XPath do
     end
   end
 
+  @doc """
+  Format an AST back to an XPath string.
+
+  ## Examples
+
+      iex> {:ok, ast} = ExYang.XPath.parse("../name")
+      iex> ExYang.XPath.format(ast)
+      "../name"
+  """
   @spec format(term()) :: String.t()
   def format(ast), do: do_format(ast)
 

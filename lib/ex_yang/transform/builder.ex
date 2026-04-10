@@ -58,7 +58,12 @@ defmodule ExYang.Transform.Builder do
   ]
 
   @doc """
-  Build a typed struct from a `{keyword, arg, subs, meta}` tuple.
+  Build a typed struct from a generic statement tuple.
+
+  ## Examples
+
+      iex> tree = {:leaf, "name", [{:type, "string", [], %{line: 2}}], %{line: 1}}
+      iex> {:ok, %ExYang.Model.Leaf{name: "name"}} = ExYang.Transform.Builder.build(tree)
   """
   @spec build({atom() | {atom(), atom()}, String.t() | nil, list(), map()}) ::
           {:ok, struct()} | {:error, term()}

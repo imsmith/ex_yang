@@ -2,6 +2,8 @@ defmodule ExYang.Encoder.EncoderTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
+  doctest ExYang.Encoder.Encoder
+
   alias ExYang.Encoder.Encoder
   alias ExYang.Model.{Module, Container, Leaf, Type, Import, Revision}
 

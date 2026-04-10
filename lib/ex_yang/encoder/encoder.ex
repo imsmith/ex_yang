@@ -46,6 +46,16 @@ defmodule ExYang.Encoder.Encoder do
     ExtensionUse
   }
 
+  @doc """
+  Encode a YANG model struct back to YANG source text.
+
+  ## Examples
+
+      iex> {:ok, mod} = ExYang.parse("module test { namespace \\"urn:test\\"; prefix t; }")
+      iex> {:ok, yang} = ExYang.Encoder.Encoder.encode(mod)
+      iex> yang =~ "module test"
+      true
+  """
   @spec encode(struct()) :: {:ok, String.t()}
   def encode(node) do
     {:ok, node |> do_encode(0) |> IO.iodata_to_binary()}

@@ -2,6 +2,8 @@ defmodule ExYang.Transform.ValidatorTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
+  doctest ExYang.Transform.Validator
+
   alias ExYang.Transform.Validator
   alias ExYang.Model.{Module, Submodule, Leaf, LeafList, Typedef, Type, BelongsTo, Container}
 

@@ -2,6 +2,8 @@ defmodule ExYang.XPathTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
+  doctest ExYang.XPath
+
   alias ExYang.XPath
 
   # ---------------------------------------------------------------------------

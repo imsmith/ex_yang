@@ -2,6 +2,8 @@ defmodule ExYangTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
+  doctest ExYang
+
   alias ExYang.Model.{Module, Leaf, Container, Type, Typedef}
 
   describe "parse/1" do

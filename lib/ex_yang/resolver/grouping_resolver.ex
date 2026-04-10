@@ -7,6 +7,9 @@ defmodule ExYang.Resolver.GroupingResolver do
   alias ExYang.Diagnostic
   alias ExYang.Model.{Container, List, Choice, Case, Uses}
 
+  @doc """
+  Expand `uses` statements inline by copying the referenced grouping's body.
+  """
   @spec resolve(struct(), map()) :: {:ok, struct(), [Diagnostic.t()]}
   def resolve(module, namespace_map) do
     lookup = build_grouping_lookup(module, namespace_map)

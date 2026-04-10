@@ -28,7 +28,15 @@ defmodule ExYang.Diagnostic do
           context: [String.t()]
         }
 
-  @doc "Format a diagnostic for terminal output."
+  @doc """
+  Format a diagnostic for terminal output.
+
+  ## Examples
+
+      iex> d = %ExYang.Diagnostic{severity: :error, phase: :validation, message: "missing type", line: 5}
+      iex> ExYang.Diagnostic.format(d) =~ "error[validation]: missing type"
+      true
+  """
   @spec format(t()) :: String.t()
   def format(%__MODULE__{} = d) do
     location =

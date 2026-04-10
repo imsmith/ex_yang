@@ -10,8 +10,18 @@ defmodule ExYang.Transform.Validator do
   alias ExYang.Model.{Module, Submodule, Leaf, LeafList, Typedef}
 
   @doc """
-  Validate a model struct recursively. Returns `{:ok, struct}` or
-  `{:error, diagnostics}` where diagnostics is a list of `Diagnostic.t()`.
+  Validate a model struct against RFC 7950 cardinality rules.
+
+  Returns `{:ok, struct}` or `{:error, diagnostics}` where diagnostics
+  is a list of `Diagnostic.t()`.
+
+  ## Examples
+
+      iex> leaf = %ExYang.Model.Leaf{name: "x", type: %ExYang.Model.Type{name: "string"}, meta: %{}}
+      iex> {:ok, _} = ExYang.Transform.Validator.validate(leaf)
+
+      iex> bad = %ExYang.Model.Leaf{name: "x", type: nil, meta: %{line: 1}}
+      iex> {:error, [%ExYang.Diagnostic{}]} = ExYang.Transform.Validator.validate(bad)
   """
   @spec validate(struct()) :: {:ok, struct()} | {:error, [Diagnostic.t()]}
   def validate(struct) do

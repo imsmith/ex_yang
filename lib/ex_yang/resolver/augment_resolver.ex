@@ -6,6 +6,9 @@ defmodule ExYang.Resolver.AugmentResolver do
   alias ExYang.Diagnostic
   alias ExYang.Model.{Container, List, Choice, Case}
 
+  @doc """
+  Apply augment statements to their target schema paths in the module body.
+  """
   @spec resolve(struct(), map()) :: {:ok, struct(), [Diagnostic.t()]}
   def resolve(module, _namespace_map) do
     case module.augments do

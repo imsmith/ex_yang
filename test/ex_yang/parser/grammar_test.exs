@@ -2,6 +2,8 @@ defmodule ExYang.Parser.GrammarTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
+  doctest ExYang.Parser.Grammar
+
   alias ExYang.Parser.Grammar
 
   describe "parse/1" do

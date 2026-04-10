@@ -4,9 +4,17 @@ defmodule ExYang do
   """
 
   @doc """
-  Parse a YANG source string into a typed model struct.
+  Parse a YANG source string into a typed module struct.
 
   Returns `{:ok, module_struct}` or `{:error, reason}`.
+
+  ## Examples
+
+      iex> {:ok, mod} = ExYang.parse("module test { namespace \\"urn:test\\"; prefix t; }")
+      iex> mod.name
+      "test"
+
+      iex> {:error, _} = ExYang.parse("invalid {")
   """
   @spec parse(String.t()) :: {:ok, struct()} | {:error, term()}
   def parse(source) when is_binary(source) do
@@ -19,7 +27,13 @@ defmodule ExYang do
   end
 
   @doc """
-  Parse a YANG source string, raising on failure.
+  Parse a YANG source string, raising on error.
+
+  ## Examples
+
+      iex> mod = ExYang.parse!("module test { namespace \\"urn:test\\"; prefix t; }")
+      iex> mod.name
+      "test"
   """
   @spec parse!(String.t()) :: struct()
   def parse!(source) do
@@ -30,11 +44,13 @@ defmodule ExYang do
   end
 
   @doc """
-  Resolve cross-module references in a parsed YANG module.
+  Resolve a parsed module against a registry of other modules.
+
+  Runs the six-phase resolution pipeline: imports, identities,
+  groupings, augments, deviations, and types.
 
   Takes a parsed module struct and an optional registry of known modules
-  (`%{module_name => %Module{}}`). Runs the full 6-phase resolver pipeline:
-  imports, types, identities, groupings, augments, deviations.
+  (`%{module_name => %Module{}}`).
 
   Returns `{:ok, %ResolvedModule{}}` or `{:error, diagnostics}`.
   """
@@ -44,18 +60,32 @@ defmodule ExYang do
   end
 
   @doc """
-  Encode a YANG model struct back to YANG source text.
+  Encode a module struct back to YANG source text (round-trip faithful).
 
   Returns `{:ok, yang_source}`.
+
+  ## Examples
+
+      iex> {:ok, mod} = ExYang.parse("module test { namespace \\"urn:test\\"; prefix t; }")
+      iex> {:ok, yang} = ExYang.encode(mod)
+      iex> yang =~ "module test"
+      true
   """
   @spec encode(struct()) :: {:ok, String.t()}
-  defdelegate encode(module), to: ExYang.Encoder.Encoder
+  def encode(module), do: ExYang.Encoder.Encoder.encode(module)
 
   @doc """
-  Format a YANG model struct to canonical style.
+  Format a module struct to canonical YANG style.
 
   Returns `{:ok, yang_source}`.
+
+  ## Examples
+
+      iex> {:ok, mod} = ExYang.parse("module test { namespace \\"urn:test\\"; prefix t; }")
+      iex> {:ok, yang} = ExYang.format(mod)
+      iex> yang =~ "module test"
+      true
   """
   @spec format(struct()) :: {:ok, String.t()}
-  defdelegate format(module), to: ExYang.Encoder.Formatter
+  def format(module), do: ExYang.Encoder.Formatter.format(module)
 end

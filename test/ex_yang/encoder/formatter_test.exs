@@ -2,6 +2,8 @@ defmodule ExYang.Encoder.FormatterTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
+  doctest ExYang.Encoder.Formatter
+
   alias ExYang.Encoder.Formatter
 
   describe "format/1" do

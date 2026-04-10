@@ -30,6 +30,10 @@ defmodule ExYang.Resolver.TypeResolver do
                    "instance-identifier"
                  ])
 
+  @doc """
+  Resolve type references in a module by following typedef chains to
+  built-in base types. Walks the module body recursively.
+  """
   @spec resolve(struct(), map(), map()) :: {:ok, struct(), [Diagnostic.t()]}
   def resolve(module, namespace_map, _opts) do
     lookup = build_typedef_lookup(module, namespace_map)

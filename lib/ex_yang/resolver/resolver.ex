@@ -20,6 +20,12 @@ defmodule ExYang.Resolver do
     DeviationResolver
   }
 
+  @doc """
+  Run the full 6-phase resolver pipeline on a parsed YANG module.
+
+  Phases: imports, identities, groupings, augments, deviations, types.
+  Returns `{:ok, %ResolvedModule{}}` or `{:error, diagnostics}`.
+  """
   @spec resolve(struct(), map()) :: {:ok, ResolvedModule.t()} | {:error, [ExYang.Diagnostic.t()]}
   def resolve(module, registry \\ %{}) do
     with {:ok, namespace_map, import_diags} <- ImportResolver.resolve(module, registry),

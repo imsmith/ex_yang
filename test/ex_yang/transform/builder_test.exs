@@ -2,6 +2,8 @@ defmodule ExYang.Transform.BuilderTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
+  doctest ExYang.Transform.Builder
+
   alias ExYang.Transform.Builder
   alias ExYang.Model.{
     Module,

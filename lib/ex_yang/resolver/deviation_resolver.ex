@@ -9,6 +9,10 @@ defmodule ExYang.Resolver.DeviationResolver do
   alias ExYang.Diagnostic
   alias ExYang.Model.{Container, List, Choice, Case}
 
+  @doc """
+  Apply deviation statements to the module body. Only `not-supported`
+  is fully implemented; other deviate types pass through as no-ops.
+  """
   @spec resolve(struct()) :: {:ok, struct(), [Diagnostic.t()]}
   def resolve(module) do
     case module.deviations do
