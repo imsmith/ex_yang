@@ -119,8 +119,14 @@ defmodule ExYang.Transform.Builder do
 
   defp take_int(subs, keyword) do
     case take_one(subs, keyword) do
-      nil -> nil
-      val -> String.to_integer(val)
+      nil ->
+        nil
+
+      val ->
+        case Integer.parse(val) do
+          {int, ""} -> int
+          _ -> raise ArgumentError, "invalid integer value #{inspect(val)} for #{keyword}"
+        end
     end
   end
 
@@ -145,7 +151,11 @@ defmodule ExYang.Transform.Builder do
     case take_one(subs, :"max-elements") do
       "unbounded" -> :unbounded
       nil -> nil
-      val -> String.to_integer(val)
+      val ->
+        case Integer.parse(val) do
+          {int, ""} -> int
+          _ -> raise ArgumentError, "invalid max-elements value: #{inspect(val)}"
+        end
     end
   end
 
@@ -762,7 +772,7 @@ defmodule ExYang.Transform.Builder do
   # Extension use (prefixed keyword tuple)
   # ---------------------------------------------------------------------------
 
-  defp do_build({prefix, name}, arg, subs, meta) when is_atom(prefix) and is_atom(name) do
+  defp do_build({prefix, name}, arg, subs, meta) when is_binary(prefix) and is_binary(name) do
     case ExYang.Transform.Extensions.transform({prefix, name}, arg, subs, meta) do
       {:ok, struct} ->
         struct

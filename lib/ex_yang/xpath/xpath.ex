@@ -273,7 +273,7 @@ defmodule ExYang.XPath do
 
     case rest2 do
       [:rparen | rest3] ->
-        call = {:call, String.to_atom(name), args}
+        call = {:call, safe_function_name(name), args}
 
         # Check if the call continues as a path: current()/..
         case rest3 do
@@ -505,5 +505,16 @@ defmodule ExYang.XPath do
 
   defp format_steps(steps) do
     Enum.map_join(steps, "/", &do_format/1)
+  end
+
+  # XPath 1.0 core functions plus YANG extensions — a finite set.
+  # Use to_existing_atom for known names, keep unknown as strings to
+  # prevent atom table exhaustion from untrusted input.
+  defp safe_function_name(name) do
+    try do
+      String.to_existing_atom(name)
+    rescue
+      ArgumentError -> name
+    end
   end
 end

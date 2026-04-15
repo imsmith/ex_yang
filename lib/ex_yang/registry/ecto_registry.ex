@@ -85,7 +85,7 @@ defmodule ExYang.Registry.EctoRegistry do
 
     case repo.one(query) do
       nil -> :error
-      record -> {:ok, :erlang.binary_to_term(record.parsed_ast)}
+      record -> {:ok, :erlang.binary_to_term(record.parsed_ast, [:safe])}
     end
   end
 
@@ -135,7 +135,7 @@ defmodule ExYang.Registry.EctoRegistry do
       end)
 
     repo.all(query)
-    |> Enum.map(fn record -> :erlang.binary_to_term(record.parsed_ast) end)
+    |> Enum.map(fn record -> :erlang.binary_to_term(record.parsed_ast, [:safe]) end)
   end
 
   @doc "Delete a module by name and optional revision, using the given repo."

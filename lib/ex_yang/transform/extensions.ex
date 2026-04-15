@@ -7,7 +7,7 @@ defmodule ExYang.Transform.Extensions do
   """
 
   @doc "Transform a prefixed extension keyword into a typed struct. Returns `{:ok, struct}` to replace the default wrapper, `:skip` to drop the statement, or `{:error, reason}` to fall back to `%ExtensionUse{}`."
-  @callback transform({atom(), atom()}, String.t() | nil, list(), map()) ::
+  @callback transform({String.t(), String.t()}, String.t() | nil, list(), map()) ::
               {:ok, struct()} | :skip | {:error, String.t()}
 
   @agent_name __MODULE__
@@ -26,8 +26,8 @@ defmodule ExYang.Transform.Extensions do
   @doc """
   Register a handler module for a `{prefix, name}` extension keyword.
   """
-  @spec register({atom(), atom()}, module()) :: :ok
-  def register({prefix, name}, handler_module) when is_atom(prefix) and is_atom(name) do
+  @spec register({String.t(), String.t()}, module()) :: :ok
+  def register({prefix, name}, handler_module) when is_binary(prefix) and is_binary(name) do
     ensure_started()
     Agent.update(@agent_name, &Map.put(&1, {prefix, name}, handler_module))
   end
@@ -35,8 +35,8 @@ defmodule ExYang.Transform.Extensions do
   @doc """
   Unregister a handler for a `{prefix, name}` extension keyword.
   """
-  @spec unregister({atom(), atom()}) :: :ok
-  def unregister({prefix, name}) when is_atom(prefix) and is_atom(name) do
+  @spec unregister({String.t(), String.t()}) :: :ok
+  def unregister({prefix, name}) when is_binary(prefix) and is_binary(name) do
     ensure_started()
     Agent.update(@agent_name, &Map.delete(&1, {prefix, name}))
   end
@@ -45,9 +45,9 @@ defmodule ExYang.Transform.Extensions do
   Transform a prefixed keyword using a registered handler, or return
   `:skip` if no handler is registered (builder will wrap as ExtensionUse).
   """
-  @spec transform({atom(), atom()}, String.t() | nil, list(), map()) ::
+  @spec transform({String.t(), String.t()}, String.t() | nil, list(), map()) ::
           {:ok, struct()} | :skip | {:error, String.t()}
-  def transform({prefix, name}, arg, subs, meta) when is_atom(prefix) and is_atom(name) do
+  def transform({prefix, name}, arg, subs, meta) when is_binary(prefix) and is_binary(name) do
     ensure_started()
 
     case Agent.get(@agent_name, &Map.get(&1, {prefix, name})) do

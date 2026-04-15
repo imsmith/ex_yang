@@ -227,12 +227,20 @@ defmodule ExYang.Parser.Grammar do
   # Keyword conversion
   # ---------------------------------------------------------------------------
 
+  # Standard YANG keywords are converted to atoms via to_existing_atom since
+  # they are already defined in the builder's do_build/4 clauses. Extension
+  # keywords (prefixed) remain as string tuples to prevent atom table exhaustion
+  # from untrusted input.
   defp to_keyword({prefix, name}) do
-    {String.to_atom(prefix), String.to_atom(name)}
+    {prefix, name}
   end
 
   defp to_keyword(name) when is_binary(name) do
-    String.to_atom(name)
+    try do
+      String.to_existing_atom(name)
+    rescue
+      ArgumentError -> name
+    end
   end
 
   defp keyword_to_string({prefix, name}), do: prefix <> ":" <> name

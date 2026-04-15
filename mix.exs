@@ -2,21 +2,42 @@ defmodule ExYang.MixProject do
   @moduledoc false
   use Mix.Project
 
+  @version "0.1.0"
+  @source_url "https://github.com/imsmith/ex_yang"
+
   def project do
     [
       app: :ex_yang,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      licenses: ["AGPL-3.0-only"],
       description: "YANG (RFC 7950) parser, resolver, and data modeling library for Elixir",
-      elixirc_paths: elixirc_paths(Mix.env())
+      elixirc_paths: elixirc_paths(Mix.env()),
+      package: package(),
+      docs: docs(),
+      source_url: @source_url
     ]
   end
 
   def application do
     [extra_applications: [:logger]]
+  end
+
+  defp package do
+    [
+      licenses: ["AGPL-3.0-only"],
+      links: %{"GitHub" => @source_url},
+      files: ~w(lib mix.exs README.md LICENSE)
+    ]
+  end
+
+  defp docs do
+    [
+      main: "ExYang",
+      source_ref: "v#{@version}",
+      extras: ["README.md"]
+    ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]

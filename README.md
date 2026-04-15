@@ -167,14 +167,14 @@ defmodule MyExtHandler do
   @behaviour ExYang.Transform.Extensions
 
   @impl true
-  def transform({:mymod, :custom}, arg, subs, meta) do
+  def transform({"mymod", "custom"}, arg, _subs, _meta) do
     {:ok, %MyCustomStruct{value: arg}}
   end
 
   def transform(_, _, _, _), do: :skip
 end
 
-ExYang.Transform.Extensions.register({:mymod, :custom}, MyExtHandler)
+ExYang.Transform.Extensions.register({"mymod", "custom"}, MyExtHandler)
 ```
 
 ## RFC Coverage

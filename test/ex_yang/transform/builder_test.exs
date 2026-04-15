@@ -137,9 +137,9 @@ defmodule ExYang.Transform.BuilderTest do
     end
 
     test "extension use (prefixed keyword)" do
-      stmt = {{:tailf, :info}, "some info", [], @meta}
+      stmt = {{"tailf", "info"}, "some info", [], @meta}
 
-      assert {:ok, %ExtensionUse{keyword: {:tailf, :info}, argument: "some info"}} =
+      assert {:ok, %ExtensionUse{keyword: {"tailf", "info"}, argument: "some info"}} =
                Builder.build(stmt)
     end
 

@@ -66,12 +66,12 @@ defmodule ExYang.Parser.GrammarTest do
 
     test "prefixed keyword" do
       input = "if:interfaces;"
-      assert {:ok, [{{:if, :interfaces}, nil, [], %{line: 1}}], _, _} = Grammar.parse(input)
+      assert {:ok, [{{"if", "interfaces"}, nil, [], %{line: 1}}], _, _} = Grammar.parse(input)
     end
 
     test "prefixed keyword as block" do
       input = "ex:my-extension arg { }"
-      assert {:ok, [{{:ex, :"my-extension"}, "arg", [], %{line: 1}}], _, _} = Grammar.parse(input)
+      assert {:ok, [{{"ex", "my-extension"}, "arg", [], %{line: 1}}], _, _} = Grammar.parse(input)
     end
 
     test "keyword argument used as unquoted string" do
