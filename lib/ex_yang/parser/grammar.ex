@@ -18,6 +18,81 @@ defmodule ExYang.Parser.Grammar do
   @type statement :: {keyword_t(), String.t() | nil, [statement()], map()}
   @type keyword_t :: atom() | {atom(), atom()}
 
+  # Compile-time map from YANG keyword string → atom. Covers all RFC 7950
+  # standard keywords. Using a map lookup bypasses String.to_existing_atom/1
+  # entirely for known keywords, which avoids the atom-table timing problem
+  # (to_existing_atom fails if the owning module hasn't been loaded yet).
+  # Unknown tokens still go through to_existing_atom with a rescue fallback
+  # so extension keywords that happen to be pre-defined atoms still convert,
+  # while truly novel strings remain strings (no atom flooding from user input).
+  @yang_keyword_map %{
+    "module" => :module,
+    "submodule" => :submodule,
+    "namespace" => :namespace,
+    "prefix" => :prefix,
+    "organization" => :organization,
+    "contact" => :contact,
+    "description" => :description,
+    "reference" => :reference,
+    "revision" => :revision,
+    "import" => :import,
+    "include" => :include,
+    "typedef" => :typedef,
+    "type" => :type,
+    "container" => :container,
+    "leaf" => :leaf,
+    "leaf-list" => :"leaf-list",
+    "list" => :list,
+    "choice" => :choice,
+    "case" => :case,
+    "anydata" => :anydata,
+    "anyxml" => :anyxml,
+    "grouping" => :grouping,
+    "uses" => :uses,
+    "rpc" => :rpc,
+    "action" => :action,
+    "input" => :input,
+    "output" => :output,
+    "notification" => :notification,
+    "augment" => :augment,
+    "deviation" => :deviation,
+    "deviate" => :deviate,
+    "identity" => :identity,
+    "feature" => :feature,
+    "if-feature" => :"if-feature",
+    "refine" => :refine,
+    "key" => :key,
+    "unique" => :unique,
+    "mandatory" => :mandatory,
+    "default" => :default,
+    "units" => :units,
+    "status" => :status,
+    "config" => :config,
+    "presence" => :presence,
+    "path" => :path,
+    "base" => :base,
+    "bit" => :bit,
+    "enum" => :enum,
+    "modifier" => :modifier,
+    "ordered-by" => :"ordered-by",
+    "max-elements" => :"max-elements",
+    "min-elements" => :"min-elements",
+    "error-message" => :"error-message",
+    "error-app-tag" => :"error-app-tag",
+    "revision-date" => :"revision-date",
+    "belongs-to" => :"belongs-to",
+    "yang-version" => :"yang-version",
+    "argument" => :argument,
+    "extension" => :extension,
+    "length" => :length,
+    "pattern" => :pattern,
+    "range" => :range,
+    "fraction-digits" => :"fraction-digits",
+    "require-instance" => :"require-instance",
+    "position" => :position,
+    "value" => :value
+  }
+
   @doc """
   Parse a YANG source string into a generic statement tree.
 
@@ -227,19 +302,29 @@ defmodule ExYang.Parser.Grammar do
   # Keyword conversion
   # ---------------------------------------------------------------------------
 
-  # Standard YANG keywords are converted to atoms via to_existing_atom since
-  # they are already defined in the builder's do_build/4 clauses. Extension
-  # keywords (prefixed) remain as string tuples to prevent atom table exhaustion
-  # from untrusted input.
+  # Standard YANG keywords are converted to atoms via direct map lookup against
+  # @yang_keyword_map, which embeds the string→atom mapping at compile time.
+  # This avoids String.to_existing_atom/1 for known keywords entirely, sidestepping
+  # the atom-table timing issue where the atom may not yet be registered if the
+  # builder module hasn't been invoked in this VM instance. Unknown tokens fall
+  # back to to_existing_atom with a rescue so any pre-defined atoms still convert,
+  # while truly novel strings remain strings (no atom flooding from user input).
+  # Prefixed extension keywords always remain as string tuples.
   defp to_keyword({prefix, name}) do
     {prefix, name}
   end
 
   defp to_keyword(name) when is_binary(name) do
-    try do
-      String.to_existing_atom(name)
-    rescue
-      ArgumentError -> name
+    case Map.fetch(@yang_keyword_map, name) do
+      {:ok, atom} ->
+        atom
+
+      :error ->
+        try do
+          String.to_existing_atom(name)
+        rescue
+          ArgumentError -> name
+        end
     end
   end
 
