@@ -630,6 +630,12 @@ defmodule ExYang.Transform.Builder do
       typedefs: build_all(subs, :typedef),
       groupings: build_all(subs, :grouping),
       if_features: take_all_args(subs, :"if-feature"),
+      extensions:
+        subs
+        |> Elixir.Enum.filter(fn {kw, _, _, _} -> is_tuple(kw) end)
+        |> Elixir.Enum.map(fn {kw, arg, sub_subs, m} ->
+          build_extension_use(kw, arg, sub_subs, m)
+        end),
       meta: meta,
       comments: comments_from(meta)
     }
