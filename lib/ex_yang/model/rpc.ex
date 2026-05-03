@@ -14,6 +14,7 @@ defmodule ExYang.Model.Rpc do
     typedefs: [],
     groupings: [],
     if_features: [],
+    extensions: [],
     meta: %{},
     comments: []
   ]
@@ -28,6 +29,7 @@ defmodule ExYang.Model.Rpc do
           typedefs: [struct()],
           groupings: [struct()],
           if_features: [String.t()],
+          extensions: [ExYang.Model.ExtensionUse.t()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
