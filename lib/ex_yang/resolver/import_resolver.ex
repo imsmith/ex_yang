@@ -13,8 +13,8 @@ defmodule ExYang.Resolver.ImportResolver do
 
   Returns `{:ok, namespace_map, diagnostics}` or `{:error, diagnostics}`.
   """
-  @spec resolve(struct(), map()) ::
-          {:ok, map(), [Diagnostic.t()]} | {:error, [Diagnostic.t()]}
+  @spec resolve(ExYang.Model.Common.schema_module(), ExYang.Resolver.registry()) ::
+          {:ok, ExYang.Resolver.namespace_map(), [Diagnostic.t()]} | {:error, [Diagnostic.t()]}
   def resolve(module, registry) do
     {ns_map, diags} =
       Enum.reduce(module.imports, {%{}, []}, fn imp, {ns, ds} ->

@@ -11,9 +11,9 @@ defmodule ExYang.Resolver.ResolvedModule do
   defstruct [:module, namespace_map: %{}, identity_graph: %{}, diagnostics: []]
 
   @type t :: %__MODULE__{
-          module: struct(),
-          namespace_map: %{String.t() => struct()},
-          identity_graph: %{String.t() => map()},
+          module: ExYang.Model.Common.schema_module(),
+          namespace_map: ExYang.Resolver.namespace_map(),
+          identity_graph: ExYang.Resolver.IdentityResolver.graph(),
           diagnostics: [ExYang.Diagnostic.t()]
         }
 end

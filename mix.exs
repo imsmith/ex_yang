@@ -2,14 +2,14 @@ defmodule ExYang.MixProject do
   @moduledoc false
   use Mix.Project
 
-  @version "0.1.1"
+  @version "0.2.0"
   @source_url "https://github.com/imsmith/ex_yang"
 
   def project do
     [
       app: :ex_yang,
       version: @version,
-      elixir: "~> 1.17",
+      elixir: "~> 1.20",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: "YANG (RFC 7950) parser, resolver, and data modeling library for Elixir",

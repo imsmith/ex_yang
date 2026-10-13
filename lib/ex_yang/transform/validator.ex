@@ -23,7 +23,8 @@ defmodule ExYang.Transform.Validator do
       iex> bad = %ExYang.Model.Leaf{name: "x", type: nil, meta: %{line: 1}}
       iex> {:error, [%ExYang.Diagnostic{}]} = ExYang.Transform.Validator.validate(bad)
   """
-  @spec validate(struct()) :: {:ok, struct()} | {:error, [Diagnostic.t()]}
+  @spec validate(node) :: {:ok, node} | {:error, [Diagnostic.t()]}
+        when node: ExYang.Model.Common.model_node()
   def validate(struct) do
     errors = do_validate(struct, [])
 

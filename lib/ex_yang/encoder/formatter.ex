@@ -13,6 +13,6 @@ defmodule ExYang.Encoder.Formatter do
       iex> yang =~ "module test"
       true
   """
-  @spec format(struct()) :: {:ok, String.t()}
+  @spec format(ExYang.Model.Common.model_node()) :: {:ok, String.t()}
   def format(node), do: Encoder.encode(node)
 end

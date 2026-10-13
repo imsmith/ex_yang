@@ -7,7 +7,7 @@ defmodule ExYang.Parser.Grammar do
       {keyword, argument, sub_statements, meta}
 
   Where:
-  - `keyword` — atom or `{atom, atom}` for prefixed keywords
+  - `keyword` — atom for RFC 7950 keywords, `{prefix, name}` strings for prefixed keywords
   - `argument` — `nil` or string (concatenation resolved)
   - `sub_statements` — list of child tuples
   - `meta` — `%{line: n}` minimum
@@ -15,8 +15,21 @@ defmodule ExYang.Parser.Grammar do
 
   alias ExYang.Parser.Lexer
 
-  @type statement :: {keyword_t(), String.t() | nil, [statement()], map()}
-  @type keyword_t :: atom() | {atom(), atom()}
+  @typedoc "A generic statement node: `{keyword, argument, sub_statements, meta}`."
+  @type statement :: {keyword_t(), String.t() | nil, [statement()], meta()}
+
+  @typedoc """
+  Statement keyword. RFC 7950 keywords become atoms; prefixed extension
+  keywords stay as `{prefix, name}` string tuples; unknown unprefixed
+  keywords stay strings (no atom flooding from user input).
+  """
+  @type keyword_t :: atom() | String.t() | {String.t(), String.t()}
+
+  @typedoc "Statement metadata: source line plus optional `string_fragments` for concatenated arguments."
+  @type meta :: %{required(:line) => pos_integer(), optional(:string_fragments) => [String.t()]}
+
+  @typedoc "A source comment: `{line, text}`."
+  @type comment :: {pos_integer(), String.t()}
 
   # Compile-time map from YANG keyword string → atom. Covers all RFC 7950
   # standard keywords. Using a map lookup bypasses String.to_existing_atom/1
@@ -107,7 +120,8 @@ defmodule ExYang.Parser.Grammar do
       iex> length(stmts)
       1
   """
-  @spec parse(String.t()) :: {:ok, [statement()]} | {:error, String.t()}
+  @spec parse(String.t()) ::
+          {:ok, [statement()], [comment()], MapSet.t(pos_integer())} | {:error, String.t()}
   def parse(input) do
     with {:ok, tokens} <- Lexer.tokenize(input) do
       comments = extract_comments(tokens)
@@ -222,7 +236,8 @@ defmodule ExYang.Parser.Grammar do
                 {:error, "unexpected end of input after argument at line #{line}"}
 
               [{bad_type, bad_meta, _} | _] ->
-                {:error, "expected ';' or '{' after argument, got #{bad_type} at line #{bad_meta.line}"}
+                {:error,
+                 "expected ';' or '{' after argument, got #{bad_type} at line #{bad_meta.line}"}
             end
 
           {:error, _} = err ->
@@ -239,10 +254,6 @@ defmodule ExYang.Parser.Grammar do
 
   defp parse_statement([{type, meta, _} | _]) do
     {:error, "expected keyword, got #{type} at line #{meta.line}"}
-  end
-
-  defp parse_statement([]) do
-    {:error, "unexpected end of input"}
   end
 
   defp parse_block_body(keyword, arg, line, tokens, extra_meta) do

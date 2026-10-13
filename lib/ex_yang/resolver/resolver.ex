@@ -10,6 +10,12 @@ defmodule ExYang.Resolver do
   6. Deviation resolution — applies deviations
   """
 
+  @typedoc "Prefix → imported module, built by `ExYang.Resolver.ImportResolver`."
+  @type namespace_map :: %{String.t() => ExYang.Model.Common.schema_module()}
+
+  @typedoc "Module name → parsed module, as supplied by the caller."
+  @type registry :: %{String.t() => ExYang.Model.Common.schema_module()}
+
   alias ExYang.Resolver.{
     ResolvedModule,
     ImportResolver,
@@ -26,7 +32,8 @@ defmodule ExYang.Resolver do
   Phases: imports, identities, groupings, augments, deviations, types.
   Returns `{:ok, %ResolvedModule{}}` or `{:error, diagnostics}`.
   """
-  @spec resolve(struct(), map()) :: {:ok, ResolvedModule.t()} | {:error, [ExYang.Diagnostic.t()]}
+  @spec resolve(ExYang.Model.Common.schema_module(), registry()) ::
+          {:ok, ResolvedModule.t()} | {:error, [ExYang.Diagnostic.t()]}
   def resolve(module, registry \\ %{}) do
     with {:ok, namespace_map, import_diags} <- ImportResolver.resolve(module, registry),
          {:ok, identity_graph} <- IdentityResolver.resolve(module, namespace_map),

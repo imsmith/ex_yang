@@ -65,8 +65,8 @@ defmodule ExYang.Transform.Builder do
       iex> tree = {:leaf, "name", [{:type, "string", [], %{line: 2}}], %{line: 1}}
       iex> {:ok, %ExYang.Model.Leaf{name: "name"}} = ExYang.Transform.Builder.build(tree)
   """
-  @spec build({atom() | {atom(), atom()}, String.t() | nil, list(), map()}) ::
-          {:ok, struct()} | {:error, term()}
+  @spec build(ExYang.Parser.Grammar.statement()) ::
+          {:ok, ExYang.Model.Common.model_node()} | {:error, term()}
   def build({keyword, arg, subs, meta}) do
     {:ok, do_build(keyword, arg, subs, meta)}
   end
@@ -149,8 +149,12 @@ defmodule ExYang.Transform.Builder do
 
   defp take_max_elements(subs) do
     case take_one(subs, :"max-elements") do
-      "unbounded" -> :unbounded
-      nil -> nil
+      "unbounded" ->
+        :unbounded
+
+      nil ->
+        nil
+
       val ->
         case Integer.parse(val) do
           {int, ""} -> int

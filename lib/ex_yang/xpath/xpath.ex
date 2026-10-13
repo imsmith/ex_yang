@@ -5,6 +5,25 @@ defmodule ExYang.XPath do
   ASTs back to strings. Does NOT evaluate.
   """
 
+  @typedoc "A location step: a name, a prefixed name, a function call, or any of those with a predicate."
+  @type step ::
+          {:step, step_name()}
+          | {:step, step_name(), ast()}
+  @type step_name :: String.t() | {String.t(), String.t()} | {:call, atom() | String.t(), [ast()]}
+
+  @typedoc "Binary operators in precedence order: `or`, `and`, comparison, additive."
+  @type binop :: :or | :and | :eq | :neq | :lt | :gt | :lte | :gte | :add | :sub
+
+  @typedoc """
+  XPath AST. Numbers are kept as their source text so formatting is lossless.
+  """
+  @type ast ::
+          {:path, :absolute | :relative, [step()]}
+          | {:call, atom() | String.t(), [ast()]}
+          | {:literal, String.t()}
+          | {:number, String.t()}
+          | {binop(), ast(), ast()}
+
   # ---------------------------------------------------------------------------
   # Public API
   # ---------------------------------------------------------------------------
@@ -18,12 +37,14 @@ defmodule ExYang.XPath do
       iex> match?({:path, :relative, _}, ast)
       true
   """
-  @spec parse(String.t()) :: {:ok, term()} | {:error, String.t()}
+  @spec parse(String.t()) :: {:ok, ast()} | {:error, String.t()}
   def parse(input) when is_binary(input) do
     tokens = tokenize(String.trim(input))
 
     case tokens do
-      {:error, msg} -> {:error, msg}
+      {:error, msg} ->
+        {:error, msg}
+
       toks ->
         case parse_or_expr(toks) do
           {:ok, ast, []} -> {:ok, ast}
@@ -42,7 +63,7 @@ defmodule ExYang.XPath do
       iex> ExYang.XPath.format(ast)
       "../name"
   """
-  @spec format(term()) :: String.t()
+  @spec format(ast()) :: String.t()
   def format(ast), do: do_format(ast)
 
   # ---------------------------------------------------------------------------
@@ -92,7 +113,8 @@ defmodule ExYang.XPath do
     tokenize(rest, [{:number, num} | acc])
   end
 
-  defp tokenize(<<c, _::binary>> = input, acc) when c in ~c"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" do
+  defp tokenize(<<c, _::binary>> = input, acc)
+       when c in ~c"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" do
     {name, rest} = consume_name(input)
     tokenize(rest, [{:name, name} | acc])
   end
@@ -185,13 +207,26 @@ defmodule ExYang.XPath do
   defp parse_comparison(tokens) do
     with {:ok, left, rest} <- parse_additive(tokens) do
       case rest do
-        [:eq | rest2] -> with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:eq, left, right}, rest3}
-        [:neq | rest2] -> with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:neq, left, right}, rest3}
-        [:lt | rest2] -> with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:lt, left, right}, rest3}
-        [:gt | rest2] -> with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:gt, left, right}, rest3}
-        [:lte | rest2] -> with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:lte, left, right}, rest3}
-        [:gte | rest2] -> with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:gte, left, right}, rest3}
-        _ -> {:ok, left, rest}
+        [:eq | rest2] ->
+          with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:eq, left, right}, rest3}
+
+        [:neq | rest2] ->
+          with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:neq, left, right}, rest3}
+
+        [:lt | rest2] ->
+          with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:lt, left, right}, rest3}
+
+        [:gt | rest2] ->
+          with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:gt, left, right}, rest3}
+
+        [:lte | rest2] ->
+          with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:lte, left, right}, rest3}
+
+        [:gte | rest2] ->
+          with {:ok, right, rest3} <- parse_additive(rest2), do: {:ok, {:gte, left, right}, rest3}
+
+        _ ->
+          {:ok, left, rest}
       end
     end
   end
@@ -359,6 +394,7 @@ defmodule ExYang.XPath do
   defp parse_step([{:name, _name}, :lparen | _] = tokens) do
     # Function call as a step (e.g., current())
     [{:name, fname} | rest] = tokens
+
     case parse_function_call(fname, rest) do
       {:ok, {:call, _, _} = call, rest2} ->
         # Check for predicate

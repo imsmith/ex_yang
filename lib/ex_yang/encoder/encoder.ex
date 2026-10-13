@@ -56,7 +56,7 @@ defmodule ExYang.Encoder.Encoder do
       iex> yang =~ "module test"
       true
   """
-  @spec encode(struct()) :: {:ok, String.t()}
+  @spec encode(ExYang.Model.Common.model_node()) :: {:ok, String.t()}
   def encode(node) do
     {:ok, node |> do_encode(0) |> IO.iodata_to_binary()}
   end

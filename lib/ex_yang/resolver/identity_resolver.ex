@@ -4,13 +4,20 @@ defmodule ExYang.Resolver.IdentityResolver do
   identities and imported identities.
   """
 
+  @typedoc "One identity's entry in the graph."
+  @type entry :: %{name: String.t(), bases: [String.t()], derived: MapSet.t(String.t())}
+
+  @typedoc "Identity name (prefixed when imported) → entry."
+  @type graph :: %{String.t() => entry()}
+
   @doc """
   Build the identity graph.
 
   Returns `{:ok, graph}` where graph is
   `%{identity_name => %{name: n, bases: [...], derived: MapSet}}`.
   """
-  @spec resolve(struct(), map()) :: {:ok, map()}
+  @spec resolve(ExYang.Model.Common.schema_module(), ExYang.Resolver.namespace_map()) ::
+          {:ok, graph()}
   def resolve(module, namespace_map) do
     # Collect all identities: local + imported (prefixed)
     local_ids = module.identities

@@ -21,9 +21,9 @@ defmodule ExYang.Model.Grouping do
           status: ExYang.Model.Common.status() | nil,
           description: String.t() | nil,
           reference: String.t() | nil,
-          typedefs: [struct()],
-          groupings: [struct()],
-          body: [struct()],
+          typedefs: [ExYang.Model.Typedef.t()],
+          groupings: [ExYang.Model.Grouping.t()],
+          body: [ExYang.Model.Common.body_node()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
@@ -50,13 +50,13 @@ defmodule ExYang.Model.Uses do
 
   @type t :: %__MODULE__{
           grouping: String.t(),
-          when_expr: struct() | nil,
+          when_expr: ExYang.Model.When.t() | nil,
           status: ExYang.Model.Common.status() | nil,
           description: String.t() | nil,
           reference: String.t() | nil,
           if_features: [String.t()],
-          refines: [struct()],
-          augments: [struct()],
+          refines: [ExYang.Model.Refine.t()],
+          augments: [ExYang.Model.Augment.t()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
@@ -93,7 +93,7 @@ defmodule ExYang.Model.Refine do
           presence: String.t() | nil,
           min_elements: non_neg_integer() | nil,
           max_elements: non_neg_integer() | :unbounded | nil,
-          must: [struct()],
+          must: [ExYang.Model.Must.t()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
@@ -119,12 +119,12 @@ defmodule ExYang.Model.Augment do
 
   @type t :: %__MODULE__{
           target_node: String.t(),
-          when_expr: struct() | nil,
+          when_expr: ExYang.Model.When.t() | nil,
           status: ExYang.Model.Common.status() | nil,
           description: String.t() | nil,
           reference: String.t() | nil,
           if_features: [String.t()],
-          body: [struct()],
+          body: [ExYang.Model.Common.body_node()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
@@ -149,7 +149,7 @@ defmodule ExYang.Model.Deviation do
           target_node: String.t(),
           description: String.t() | nil,
           reference: String.t() | nil,
-          deviates: [struct()],
+          deviates: [ExYang.Model.Deviate.t()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
@@ -181,11 +181,11 @@ defmodule ExYang.Model.Deviate do
           config: ExYang.Model.Common.config(),
           default: String.t() | nil,
           mandatory: boolean() | nil,
-          type_replacement: struct() | nil,
+          type_replacement: ExYang.Model.Type.t() | nil,
           units: String.t() | nil,
           min_elements: non_neg_integer() | nil,
           max_elements: non_neg_integer() | :unbounded | nil,
-          must: [struct()],
+          must: [ExYang.Model.Must.t()],
           unique: [[String.t()]],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]

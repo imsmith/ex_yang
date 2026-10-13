@@ -12,37 +12,46 @@ defmodule ExYang.Registry.EctoRegistry do
 
   @behaviour ExYang.Registry
 
+  alias ExYang.Model.Common
+
   alias ExYang.Registry.Schema.{YangModule, YangDependency, YangIdentity}
   import Ecto.Query
 
   # ── Behaviour callbacks ──────────────────────────────────────────
 
   @impl ExYang.Registry
+  @spec store(Common.schema_module(), String.t()) ::
+          {:ok, binary()} | {:error, Ecto.Changeset.t()}
   def store(module, source) do
     store(module, source, default_repo())
   end
 
   @impl ExYang.Registry
+  @spec fetch(String.t(), String.t() | nil) :: {:ok, Common.schema_module()} | :error
   def fetch(name, revision) do
     fetch(name, revision, default_repo())
   end
 
   @impl ExYang.Registry
+  @spec dependencies(String.t(), String.t() | nil) :: [ExYang.Registry.dependency()]
   def dependencies(name, revision) do
     dependencies(name, revision, default_repo())
   end
 
   @impl ExYang.Registry
+  @spec dependents(String.t(), String.t() | nil) :: [ExYang.Registry.dependency()]
   def dependents(name, revision) do
     dependents(name, revision, default_repo())
   end
 
   @impl ExYang.Registry
+  @spec search(keyword()) :: [Common.schema_module()]
   def search(filters) do
     search(filters, default_repo())
   end
 
   @impl ExYang.Registry
+  @spec delete(String.t(), String.t() | nil) :: :ok | :error
   def delete(name, revision) do
     delete(name, revision, default_repo())
   end
@@ -50,7 +59,8 @@ defmodule ExYang.Registry.EctoRegistry do
   # ── Repo-parameterized API ───────────────────────────────────────
 
   @doc "Store a parsed module with its source, using the given repo."
-  @spec store(struct(), String.t(), module()) :: {:ok, binary()} | {:error, Ecto.Changeset.t()}
+  @spec store(Common.schema_module(), String.t(), module()) ::
+          {:ok, binary()} | {:error, Ecto.Changeset.t()}
   def store(module, source, repo) do
     attrs = %{
       name: module.name,
@@ -79,7 +89,7 @@ defmodule ExYang.Registry.EctoRegistry do
   end
 
   @doc "Fetch a module by name and optional revision string, using the given repo."
-  @spec fetch(String.t(), String.t() | nil, module()) :: {:ok, struct()} | :error
+  @spec fetch(String.t(), String.t() | nil, module()) :: {:ok, Common.schema_module()} | :error
   def fetch(name, revision, repo) do
     query = from_name_revision(name, revision)
 
@@ -90,15 +100,16 @@ defmodule ExYang.Registry.EctoRegistry do
   end
 
   @doc "List dependency records for a module, using the given repo."
-  @spec dependencies(String.t(), String.t() | nil, module()) :: [map()]
+  @spec dependencies(String.t(), String.t() | nil, module()) :: [ExYang.Registry.dependency()]
   def dependencies(name, revision, repo) do
     with {:ok, record} <- fetch_record(name, revision, repo) do
       query =
-        from d in YangDependency,
+        from(d in YangDependency,
           join: m in YangModule,
           on: d.target_module_id == m.id,
           where: d.source_module_id == ^record.id,
           select: %{name: m.name, revision: m.revision, type: d.type}
+        )
 
       repo.all(query)
     else
@@ -107,15 +118,16 @@ defmodule ExYang.Registry.EctoRegistry do
   end
 
   @doc "List modules that depend on the given module, using the given repo."
-  @spec dependents(String.t(), String.t() | nil, module()) :: [map()]
+  @spec dependents(String.t(), String.t() | nil, module()) :: [ExYang.Registry.dependency()]
   def dependents(name, revision, repo) do
     with {:ok, record} <- fetch_record(name, revision, repo) do
       query =
-        from d in YangDependency,
+        from(d in YangDependency,
           join: m in YangModule,
           on: d.source_module_id == m.id,
           where: d.target_module_id == ^record.id,
           select: %{name: m.name, revision: m.revision, type: d.type}
+        )
 
       repo.all(query)
     else
@@ -124,7 +136,7 @@ defmodule ExYang.Registry.EctoRegistry do
   end
 
   @doc "Search modules by keyword filters, using the given repo."
-  @spec search(keyword(), module()) :: [struct()]
+  @spec search(keyword(), module()) :: [Common.schema_module()]
   def search(filters, repo) do
     query =
       Enum.reduce(filters, from(m in YangModule), fn
@@ -152,23 +164,25 @@ defmodule ExYang.Registry.EctoRegistry do
   # ── Private helpers ──────────────────────────────────────────────
 
   defp delete_query(name, nil) do
-    from m in YangModule, where: m.name == ^name
+    from(m in YangModule, where: m.name == ^name)
   end
 
   defp delete_query(name, revision) do
-    from m in YangModule, where: m.name == ^name and m.revision == ^revision
+    from(m in YangModule, where: m.name == ^name and m.revision == ^revision)
   end
 
   defp from_name_revision(name, nil) do
-    from m in YangModule,
+    from(m in YangModule,
       where: m.name == ^name,
       order_by: [desc: m.revision],
       limit: 1
+    )
   end
 
   defp from_name_revision(name, revision) do
-    from m in YangModule,
+    from(m in YangModule,
       where: m.name == ^name and m.revision == ^revision
+    )
   end
 
   defp fetch_record(name, revision, repo) do

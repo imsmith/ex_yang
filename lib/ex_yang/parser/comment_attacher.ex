@@ -8,8 +8,8 @@ defmodule ExYang.Parser.CommentAttacher do
   - A comment separated from the next statement by a blank line → `:floating`
   """
 
-  @type statement :: {atom() | {atom(), atom()}, String.t() | nil, [statement()], map()}
-  @type comment :: {pos_integer(), String.t()}
+  @type statement :: ExYang.Parser.Grammar.statement()
+  @type comment :: ExYang.Parser.Grammar.comment()
 
   @doc """
   Attach comments to statement nodes.
@@ -20,7 +20,7 @@ defmodule ExYang.Parser.CommentAttacher do
 
   Returns the statements with comments attached in `meta.comments`.
   """
-  @spec attach([statement()], [comment()], MapSet.t()) :: [statement()]
+  @spec attach([statement()], [comment()], MapSet.t(pos_integer())) :: [statement()]
   def attach(statements, [], _blank_lines), do: statements
   def attach([], _comments, _blank_lines), do: []
 

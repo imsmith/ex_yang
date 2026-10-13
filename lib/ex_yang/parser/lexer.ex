@@ -13,6 +13,25 @@ defmodule ExYang.Parser.Lexer do
 
   import NimbleParsec
 
+  @type token_type ::
+          :keyword
+          | :dq_string
+          | :sq_string
+          | :open_brace
+          | :close_brace
+          | :semicolon
+          | :plus
+          | :line_comment
+          | :block_comment
+          | :newline
+          | :whitespace
+
+  @typedoc "Source position of a token."
+  @type position :: %{line: pos_integer(), column: pos_integer(), offset: non_neg_integer()}
+
+  @typedoc "A token: `{type, position, value}`. Prefixed keywords carry a `{prefix, name}` value."
+  @type token :: {token_type(), position(), String.t() | {String.t(), String.t()}}
+
   # ---------------------------------------------------------------------------
   # Helpers
   # ---------------------------------------------------------------------------
@@ -66,7 +85,7 @@ defmodule ExYang.Parser.Lexer do
     |> repeat(
       choice([
         dq_escape,
-        utf8_char([not: ?", not: ?\\])
+        utf8_char(not: ?", not: ?\\)
       ])
     )
     |> ignore(ascii_char([?"]))
@@ -75,7 +94,7 @@ defmodule ExYang.Parser.Lexer do
   # Single-quoted string — literal, no escapes
   sq_string =
     ignore(ascii_char([?']))
-    |> repeat(utf8_char([not: ?']))
+    |> repeat(utf8_char(not: ?'))
     |> ignore(ascii_char([?']))
     |> tag(:sq_string)
 
@@ -120,7 +139,7 @@ defmodule ExYang.Parser.Lexer do
       keyword
     ])
 
-  defparsec(:yang_tokens, repeat(token) |> eos(), inline: true)
+  defparsecp(:yang_tokens, repeat(token) |> eos(), inline: true)
 
   # ---------------------------------------------------------------------------
   # Public API
@@ -131,14 +150,15 @@ defmodule ExYang.Parser.Lexer do
 
   Returns `{:ok, tokens}` or `{:error, reason}`.
   """
-  @spec tokenize(String.t()) :: {:ok, list()} | {:error, String.t()}
+  @spec tokenize(String.t()) :: {:ok, [token()]} | {:error, String.t()}
   def tokenize(input) do
     case yang_tokens(input) do
       {:ok, raw, "", _context, _line, _offset} ->
         {:ok, build_tokens(raw, input)}
 
       {:ok, _raw, rest, _context, {line, _}, offset} ->
-        {:error, "unexpected input at line #{line}, offset #{offset}: #{inspect(String.slice(rest, 0, 20))}"}
+        {:error,
+         "unexpected input at line #{line}, offset #{offset}: #{inspect(String.slice(rest, 0, 20))}"}
 
       {:error, reason, _rest, _context, {line, _}, offset} ->
         {:error, "parse error at line #{line}, offset #{offset}: #{reason}"}
@@ -286,7 +306,8 @@ defmodule ExYang.Parser.Lexer do
     |> String.to_charlist()
     |> Enum.reduce({line, col}, fn
       ?\n, {l, _c} -> {l + 1, 1}
-      ?\r, {l, _c} -> {l, 1}  # \r alone resets col; \r\n handled by \n following
+      # \r alone resets col; \r\n handled by \n following
+      ?\r, {l, _c} -> {l, 1}
       _, {l, c} -> {l, c + 1}
     end)
   end

@@ -13,7 +13,8 @@ defmodule ExYang.Resolver.DeviationResolver do
   Apply deviation statements to the module body. Only `not-supported`
   is fully implemented; other deviate types pass through as no-ops.
   """
-  @spec resolve(struct()) :: {:ok, struct(), [Diagnostic.t()]}
+  @spec resolve(ExYang.Model.Common.schema_module()) ::
+          {:ok, ExYang.Model.Common.schema_module(), [Diagnostic.t()]}
   def resolve(module) do
     case module.deviations do
       [] ->
@@ -53,8 +54,7 @@ defmodule ExYang.Resolver.DeviationResolver do
     diag = %Diagnostic{
       severity: :info,
       phase: :resolution,
-      message:
-        "deviate #{deviate_type} for \"#{target_node}\" is a stub — not applied"
+      message: "deviate #{deviate_type} for \"#{target_node}\" is a stub — not applied"
     }
 
     {body, [diag | diags]}

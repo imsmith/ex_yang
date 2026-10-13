@@ -17,7 +17,7 @@ defmodule ExYang.Model.Must do
 
   @type t :: %__MODULE__{
           xpath: String.t(),
-          xpath_ast: term(),
+          xpath_ast: ExYang.XPath.ast() | nil,
           error_message: String.t() | nil,
           error_app_tag: String.t() | nil,
           description: String.t() | nil,
@@ -44,7 +44,7 @@ defmodule ExYang.Model.When do
 
   @type t :: %__MODULE__{
           xpath: String.t(),
-          xpath_ast: term(),
+          xpath_ast: ExYang.XPath.ast() | nil,
           description: String.t() | nil,
           reference: String.t() | nil,
           meta: ExYang.Model.Common.meta(),

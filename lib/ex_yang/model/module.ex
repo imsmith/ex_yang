@@ -47,26 +47,28 @@ defmodule ExYang.Model.Module do
           imports: [ExYang.Model.Import.t()],
           includes: [ExYang.Model.Include.t()],
           revisions: [ExYang.Model.Revision.t()],
-          body: [struct()],
-          typedefs: [struct()],
-          groupings: [struct()],
-          identities: [struct()],
-          extensions: [struct()],
-          rpcs: [struct()],
-          notifications: [struct()],
-          augments: [struct()],
-          deviations: [struct()],
-          features: [struct()],
+          body: [ExYang.Model.Common.body_node()],
+          typedefs: [ExYang.Model.Typedef.t()],
+          groupings: [ExYang.Model.Grouping.t()],
+          identities: [ExYang.Model.Identity.t()],
+          extensions: [ExYang.Model.ExtensionDef.t()],
+          rpcs: [ExYang.Model.Rpc.t()],
+          notifications: [ExYang.Model.Notification.t()],
+          augments: [ExYang.Model.Augment.t()],
+          deviations: [ExYang.Model.Deviation.t()],
+          features: [ExYang.Model.Feature.t()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
 
   @impl Access
+  @spec fetch(t(), atom()) :: {:ok, term()} | :error
   def fetch(struct, key) do
     Map.fetch(struct, key)
   end
 
   @impl Access
+  @spec get_and_update(t(), atom(), (term() -> {term(), term()} | :pop)) :: {term(), t()}
   def get_and_update(struct, key, fun) do
     current = Map.get(struct, key)
 
@@ -77,6 +79,7 @@ defmodule ExYang.Model.Module do
   end
 
   @impl Access
+  @spec pop(t(), atom()) :: {term(), t()}
   def pop(struct, key) do
     default = Map.get(%__MODULE__{name: struct.name}, key)
     {Map.get(struct, key), Map.put(struct, key, default)}
@@ -132,24 +135,26 @@ defmodule ExYang.Model.Submodule do
           imports: [ExYang.Model.Import.t()],
           includes: [ExYang.Model.Include.t()],
           revisions: [ExYang.Model.Revision.t()],
-          body: [struct()],
-          typedefs: [struct()],
-          groupings: [struct()],
-          identities: [struct()],
-          extensions: [struct()],
-          rpcs: [struct()],
-          notifications: [struct()],
-          augments: [struct()],
-          deviations: [struct()],
-          features: [struct()],
+          body: [ExYang.Model.Common.body_node()],
+          typedefs: [ExYang.Model.Typedef.t()],
+          groupings: [ExYang.Model.Grouping.t()],
+          identities: [ExYang.Model.Identity.t()],
+          extensions: [ExYang.Model.ExtensionDef.t()],
+          rpcs: [ExYang.Model.Rpc.t()],
+          notifications: [ExYang.Model.Notification.t()],
+          augments: [ExYang.Model.Augment.t()],
+          deviations: [ExYang.Model.Deviation.t()],
+          features: [ExYang.Model.Feature.t()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
 
   @impl Access
+  @spec fetch(t(), atom()) :: {:ok, term()} | :error
   def fetch(struct, key), do: Map.fetch(struct, key)
 
   @impl Access
+  @spec get_and_update(t(), atom(), (term() -> {term(), term()} | :pop)) :: {term(), t()}
   def get_and_update(struct, key, fun) do
     current = Map.get(struct, key)
 
@@ -160,6 +165,7 @@ defmodule ExYang.Model.Submodule do
   end
 
   @impl Access
+  @spec pop(t(), atom()) :: {term(), t()}
   def pop(struct, key) do
     default = Map.get(%__MODULE__{name: struct.name}, key)
     {Map.get(struct, key), Map.put(struct, key, default)}

@@ -11,7 +11,7 @@ Add `ex_yang` to your dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ex_yang, "~> 0.1.0"},
+    {:ex_yang, "~> 0.2.0"},
     # Pick your database adapter:
     {:ecto_sqlite3, "~> 0.17"},  # or
     {:postgrex, "~> 0.19"}
@@ -187,8 +187,29 @@ Tested against real IETF modules: `ietf-yang-types@2013-07-15`, `ietf-inet-types
 
 ## Requirements
 
-- Elixir 1.17+
-- OTP 27+
+- Elixir 1.20+ (OTP 27+)
+- Optional: `ecto_sqlite3` or `postgrex` for the Ecto registry
+
+## Types
+
+ExYang is written for the Elixir 1.20 set-theoretic type checker and
+compiles clean under it. The checker works by inference (function bodies,
+guards, struct patterns), so it needs no annotations; the `@spec` and
+`@type` declarations in the library are the documented contract for
+callers, ExDoc, and Dialyzer.
+
+- Every public function has a `@spec`; a test fails if one is added without.
+- Every `ExYang.Model.*` struct has a `t()` with concrete field types.
+  `ExYang.Model.Common` defines the shared unions: `t:ExYang.Model.Common.schema_module/0`
+  (`Module.t() | Submodule.t()`), `t:ExYang.Model.Common.data_def/0`, `t:ExYang.Model.Common.body_node/0`, `t:ExYang.Model.Common.model_node/0`.
+- Intermediate representations are typed: `t:ExYang.Lexer.token/0`,
+  `t:ExYang.Grammar.statement/0`, `t:ExYang.XPath.ast/0`, `t:ExYang.Resolver.namespace_map/0`.
+
+```elixir
+@spec ExYang.parse(String.t()) :: {:ok, ExYang.Model.Common.schema_module()} | {:error, term()}
+@spec ExYang.resolve(ExYang.Model.Common.schema_module(), ExYang.Resolver.registry()) ::
+        {:ok, ExYang.Resolver.ResolvedModule.t()} | {:error, [ExYang.Diagnostic.t()]}
+```
 
 ## License
 

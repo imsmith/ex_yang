@@ -34,7 +34,8 @@ defmodule ExYang.Resolver.TypeResolver do
   Resolve type references in a module by following typedef chains to
   built-in base types. Walks the module body recursively.
   """
-  @spec resolve(struct(), map(), map()) :: {:ok, struct(), [Diagnostic.t()]}
+  @spec resolve(ExYang.Model.Common.schema_module(), ExYang.Resolver.namespace_map(), map()) ::
+          {:ok, ExYang.Model.Common.schema_module(), [Diagnostic.t()]}
   def resolve(module, namespace_map, _opts) do
     lookup = build_typedef_lookup(module, namespace_map)
     {updated_body, diags} = walk_body(module.body, lookup, module.typedefs, [])

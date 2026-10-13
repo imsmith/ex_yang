@@ -18,7 +18,7 @@ defmodule ExYang.Model.Typedef do
 
   @type t :: %__MODULE__{
           name: String.t(),
-          type: struct() | nil,
+          type: ExYang.Model.Type.t() | nil,
           default: String.t() | nil,
           status: ExYang.Model.Common.status() | nil,
           units: String.t() | nil,
@@ -54,14 +54,14 @@ defmodule ExYang.Model.Type do
   @type t :: %__MODULE__{
           name: String.t(),
           base: String.t() | nil,
-          range: struct() | nil,
-          length: struct() | nil,
+          range: ExYang.Model.Range.t() | nil,
+          length: ExYang.Model.Length.t() | nil,
           fraction_digits: non_neg_integer() | nil,
           path: String.t() | nil,
           require_instance: boolean() | nil,
-          patterns: [struct()],
-          enum_values: [struct()],
-          bit_values: [struct()],
+          patterns: [ExYang.Model.Pattern.t()],
+          enum_values: [ExYang.Model.Enum.t()],
+          bit_values: [ExYang.Model.Bit.t()],
           union_types: [t()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]

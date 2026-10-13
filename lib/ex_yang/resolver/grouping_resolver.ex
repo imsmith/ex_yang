@@ -10,7 +10,8 @@ defmodule ExYang.Resolver.GroupingResolver do
   @doc """
   Expand `uses` statements inline by copying the referenced grouping's body.
   """
-  @spec resolve(struct(), map()) :: {:ok, struct(), [Diagnostic.t()]}
+  @spec resolve(ExYang.Model.Common.schema_module(), ExYang.Resolver.namespace_map()) ::
+          {:ok, ExYang.Model.Common.schema_module(), [Diagnostic.t()]}
   def resolve(module, namespace_map) do
     lookup = build_grouping_lookup(module, namespace_map)
     {body, diags} = walk_body(module.body, lookup, module.groupings, [], MapSet.new())

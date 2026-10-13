@@ -21,13 +21,13 @@ defmodule ExYang.Model.Rpc do
 
   @type t :: %__MODULE__{
           name: String.t(),
-          input: struct() | nil,
-          output: struct() | nil,
+          input: ExYang.Model.Input.t() | nil,
+          output: ExYang.Model.Output.t() | nil,
           status: ExYang.Model.Common.status() | nil,
           description: String.t() | nil,
           reference: String.t() | nil,
-          typedefs: [struct()],
-          groupings: [struct()],
+          typedefs: [ExYang.Model.Typedef.t()],
+          groupings: [ExYang.Model.Grouping.t()],
           if_features: [String.t()],
           extensions: [ExYang.Model.ExtensionUse.t()],
           meta: ExYang.Model.Common.meta(),
@@ -59,13 +59,13 @@ defmodule ExYang.Model.Action do
 
   @type t :: %__MODULE__{
           name: String.t(),
-          input: struct() | nil,
-          output: struct() | nil,
+          input: ExYang.Model.Input.t() | nil,
+          output: ExYang.Model.Output.t() | nil,
           status: ExYang.Model.Common.status() | nil,
           description: String.t() | nil,
           reference: String.t() | nil,
-          typedefs: [struct()],
-          groupings: [struct()],
+          typedefs: [ExYang.Model.Typedef.t()],
+          groupings: [ExYang.Model.Grouping.t()],
           if_features: [String.t()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
@@ -78,20 +78,18 @@ defmodule ExYang.Model.Input do
   """
 
   @enforce_keys []
-  defstruct [
-    must: [],
-    typedefs: [],
-    groupings: [],
-    body: [],
-    meta: %{},
-    comments: []
-  ]
+  defstruct must: [],
+            typedefs: [],
+            groupings: [],
+            body: [],
+            meta: %{},
+            comments: []
 
   @type t :: %__MODULE__{
-          must: [struct()],
-          typedefs: [struct()],
-          groupings: [struct()],
-          body: [struct()],
+          must: [ExYang.Model.Must.t()],
+          typedefs: [ExYang.Model.Typedef.t()],
+          groupings: [ExYang.Model.Grouping.t()],
+          body: [ExYang.Model.Common.body_node()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
@@ -103,20 +101,18 @@ defmodule ExYang.Model.Output do
   """
 
   @enforce_keys []
-  defstruct [
-    must: [],
-    typedefs: [],
-    groupings: [],
-    body: [],
-    meta: %{},
-    comments: []
-  ]
+  defstruct must: [],
+            typedefs: [],
+            groupings: [],
+            body: [],
+            meta: %{},
+            comments: []
 
   @type t :: %__MODULE__{
-          must: [struct()],
-          typedefs: [struct()],
-          groupings: [struct()],
-          body: [struct()],
+          must: [ExYang.Model.Must.t()],
+          typedefs: [ExYang.Model.Typedef.t()],
+          groupings: [ExYang.Model.Grouping.t()],
+          body: [ExYang.Model.Common.body_node()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
         }
@@ -147,10 +143,10 @@ defmodule ExYang.Model.Notification do
           status: ExYang.Model.Common.status() | nil,
           description: String.t() | nil,
           reference: String.t() | nil,
-          must: [struct()],
-          typedefs: [struct()],
-          groupings: [struct()],
-          body: [struct()],
+          must: [ExYang.Model.Must.t()],
+          typedefs: [ExYang.Model.Typedef.t()],
+          groupings: [ExYang.Model.Grouping.t()],
+          body: [ExYang.Model.Common.body_node()],
           if_features: [String.t()],
           meta: ExYang.Model.Common.meta(),
           comments: [ExYang.Model.Common.comment()]
