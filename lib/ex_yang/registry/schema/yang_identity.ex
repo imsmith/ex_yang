@@ -10,4 +10,6 @@ defmodule ExYang.Registry.Schema.YangIdentity do
     field :name, :string
     field :base_names, :string
   end
+
+  @type t :: %__MODULE__{}
 end

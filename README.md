@@ -199,6 +199,8 @@ guards, struct patterns), so it needs no annotations; the `@spec` and
 callers, ExDoc, and Dialyzer.
 
 - Every public function has a `@spec`; a test fails if one is added without.
+- `mix dialyzer` runs clean. Opaqueness checks are off (`:no_opaque`) to
+  dodge a known OTP 28+ false positive on `MapSet` internals.
 - Every `ExYang.Model.*` struct has a `t()` with concrete field types.
   `ExYang.Model.Common` defines the shared unions: `t:ExYang.Model.Common.schema_module/0`
   (`Module.t() | Submodule.t()`), `t:ExYang.Model.Common.data_def/0`, `t:ExYang.Model.Common.body_node/0`, `t:ExYang.Model.Common.model_node/0`.

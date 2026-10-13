@@ -16,6 +16,7 @@ defmodule ExYang.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       package: package(),
       docs: docs(),
+      dialyzer: [flags: [:no_opaque]],
       source_url: @source_url
     ]
   end
@@ -50,7 +51,8 @@ defmodule ExYang.MixProject do
       {:ecto_sql, "~> 3.12"},
       {:ecto_sqlite3, "~> 0.17", optional: true},
       {:postgrex, "~> 0.19", optional: true},
-      {:ex_doc, "~> 0.34", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 end

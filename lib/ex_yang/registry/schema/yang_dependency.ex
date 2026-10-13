@@ -11,4 +11,6 @@ defmodule ExYang.Registry.Schema.YangDependency do
     field :type, Ecto.Enum, values: [:import, :include, :augment, :deviation, :identity_base, :uses_grouping]
     field :target_node_path, :string
   end
+
+  @type t :: %__MODULE__{}
 end
