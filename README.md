@@ -11,7 +11,7 @@ Add `ex_yang` to your dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ex_yang, "~> 0.2.0"},
+    {:ex_yang, "~> 0.3.0"},
     # Pick your database adapter:
     {:ecto_sqlite3, "~> 0.17"},  # or
     {:postgrex, "~> 0.19"}
